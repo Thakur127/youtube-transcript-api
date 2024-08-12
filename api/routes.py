@@ -44,7 +44,13 @@ def youtube_transcription(
     if token_available:
         try:
             response = YouTubeTranscriptApi.get_transcript(
-                video_id=video_id, languages=lang
+                video_id=video_id,
+                languages=lang,
+                proxies=[
+                    "http://185.95.186.143:60606",
+                    "http://116.125.141.115:80",
+                    "http://219.65.73.81:80",
+                ],
             )
 
             # Use the lock to ensure thread safety when modifying the token bucket
