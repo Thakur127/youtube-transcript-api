@@ -1,4 +1,5 @@
-import asyncio
+import threading, asyncio, os
+from dotenv import load_dotenv
 from fastapi import APIRouter, HTTPException, Query, status, Depends, BackgroundTasks
 from fastapi.responses import JSONResponse
 from typing import Annotated, List
@@ -7,7 +8,13 @@ from youtube_transcript_api import (
     TranscriptsDisabled,
     NoTranscriptFound,
 )
-import threading
+
+load_dotenv()
+
+PROXY_USERNAME = os.getenv("PROXY_USERNAME")
+PROXY_PASSWORD = os.getenv("PROXY_PASSWORD")
+PROXY_ADDRESS = os.getenv("PROXY_ADDRESS")
+PROXY_PORT = os.getenv("PROXY_PORT")
 
 router = APIRouter()
 
@@ -46,11 +53,9 @@ def youtube_transcription(
             response = YouTubeTranscriptApi.get_transcript(
                 video_id=video_id,
                 languages=lang,
-                proxies=[
-                    "http://185.95.186.143:60606",
-                    "http://116.125.141.115:80",
-                    "http://219.65.73.81:80",
-                ],
+                proxies={
+                    "http": f"http://{PROXY_USERNAME}:{PROXY_PASSWORD}@{PROXY_ADDRESS}:{PROXY_PORT}",
+                },
             )
 
             # Use the lock to ensure thread safety when modifying the token bucket
